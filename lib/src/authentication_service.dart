@@ -20,18 +20,16 @@ class Authentication {
 
   Future<Map<String, String>> get headers async {
     final clientId = await _getClientId();
-    final savedCredentials = await _getSavedCredentials();
+    final savedCredentials = await _getCredentials();
 
     if (_credentials == null) {
       // Assume no user
-      debugPrint('_Credentials are null');
       if (savedCredentials == null) {
         // Brand new user
-        debugPrint('Brand new user');
         _credentials = await _authenticate(clientId: clientId);
+        _saveCredentials();
       } else {
         // Recover user
-        debugPrint('Recovering saved user: $savedCredentials');
         _credentials = AccessCredentials.fromJson(savedCredentials);
       }
     }
@@ -41,11 +39,14 @@ class Authentication {
       debugPrint('Refreshing access token');
       _credentials = await refreshCredentials(clientId, _credentials!, client);
       _credentials ??= await _authenticate(clientId: clientId);
+      _saveCredentials();
     }
 
     if (_credentials?.accessToken == null) throw 'Failed to authenticate';
     final token = _credentials!.accessToken;
-    return {'Authorization': "${token.type} ${token.data}"};
+    final authorization = '${token.type} ${token.data}';
+    debugPrint(authorization);
+    return {'Authorization': authorization};
   }
 
   Future<AccessCredentials> _authenticate({required ClientId clientId}) async {
@@ -57,10 +58,18 @@ class Authentication {
     }
   }
 
-  Future<Map<String, dynamic>?> _getSavedCredentials() async {
+  Future<Map<String, dynamic>?> _getCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? json = prefs.getString('credentials');
     return json == null ? null : jsonDecode(json);
+  }
+
+  Future<void> _saveCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (_credentials == null) throw 'Tring to save unknown credentials';
+    final json = jsonEncode(_credentials!.toJson());
+    prefs.setString('credentials', json);
+    debugPrint('Credentials saved');
   }
 
   Future<ClientId> _getClientId() async {
