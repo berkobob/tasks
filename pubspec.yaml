@@ -1,5 +1,5 @@
 name: tasks
-description: A new Flutter package project.
+description: A library to create, read, edit & delete Tasks from the Google Tasks API.
 version: 1.0.0
 homepage: https://github.com/berkobob/tasks
 
