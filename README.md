@@ -1,48 +1,77 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Tasks
+ 
+A Flutter API to create, edit, delete and get Tasks for the Google Tasks API
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
+## Setup Instructions
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
+Permission is needed for the API to access the Internet
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+### MacOS
 
-## Features
+For MacOS include the following in `macos/Runner/DebugProfile.entitlements` 
+and in `macos/Runner/Release.entitlements`:
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
-```dart
-const like = 'sample';
 ```
-
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
-
 	<key>com.apple.security.network.client</key>
 	<true/>
+```
 
+### iOS
 
+For ios include the following in `ios/Runner/info.plist`:
+
+```
 	<key>NSAppTransportSecurity</key>
-<dict>
-   <key>NSAllowsArbitraryLoads</key><true/>
-</dict>
+	<dict>
+ 	  <key>NSAllowsArbitraryLoads</key><true/>
+	</dict>
+```
+
+### Google Cloud
+
+You will need to create a project on Google [Cloud](https://cloud.google.com/) and
+enable [Tasks API](https://developers.google.com/tasks). Then create oAuth 2.0 Client
+IDs and then download the oAuth Client to `assets/client-secrets.json`
+
+```json
+{
+    "installed": {
+        "client_id": "Your Client ID",
+        "project_id": "tasks-367812",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_secret": "Top secret",
+        "redirect_uris": [
+            "http://localhost"
+        ]
+    }
+}
+```
+
+Alternatively, create the following envionment variables:
+
+* `Platform.environment['client_id']` // Your Client ID
+
+* `Platform.environment['client_secret']` // Your Client secret
+
+## Usage Instructions
+
+Instatiate the API [Tasks] once.
+
+```dart
+Future<bool> hasAccess()
+Future<List<TaskList>> getLists()
+Future<TaskList> getDefaultList()
+Future<List<Task>> getTasksForList(TaskList list, {String options = ''})
+Future<Task> createTask({required TaskList list, required Task task})
+Future saveTask(Task task)
+Future deleteTask(Task task)
+```
+
+## Todo
+
+Test on :
+- windows
+- linux
+- web

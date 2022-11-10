@@ -4,14 +4,16 @@ import 'package:tasks/src/authentication_service.dart';
 import 'package:tasks/tasks.dart';
 import 'package:http/http.dart' as http;
 
+/// The [Tasks] API provides async access to Google [Task]s
 class Tasks {
   static const String rootUrl = 'https://tasks.googleapis.com/tasks/v1';
   static const String suffix = '?maxResults=1000';
-  final authentication = Authentication();
+  final _authentication = Authentication();
 
+  /// Whether access to Google Tasks API is available
   Future<bool> hasAccess() async {
     try {
-      await authentication.headers;
+      await _authentication.headers;
       return true;
     } catch (e) {
       debugPrint('$e');
@@ -19,10 +21,12 @@ class Tasks {
     }
   }
 
+  /// Returns a list of the [TaskList]s available
   Future<List<TaskList>> getLists() async {
     final uri = Uri.parse('$rootUrl/users/@me/lists$suffix');
     debugPrint(uri.toString());
-    final response = await http.get(uri, headers: await authentication.headers);
+    final response =
+        await http.get(uri, headers: await _authentication.headers);
 
     if (response.statusCode != 200) {
       throw 'Failed to get lists: ${response.reasonPhrase}';
@@ -33,16 +37,21 @@ class Tasks {
         .toList();
   }
 
+  /// Returns the default [TaskList] which cannot be deleted and will be used
+  /// if no list is specified when creating a [Task].
   Future<TaskList> getDefaultList() async {
     final lists = await getLists();
     return lists.first;
   }
 
+  /// Returns the [Task]s belonging to a [TaskList]
+  /// [options] parameters are documented [here](https://developers.google.com/tasks/reference/rest/v1/tasks/list)
   Future<List<Task>> getTasksForList(TaskList list,
       {String options = ''}) async {
     final uri = Uri.parse('$rootUrl/lists/${list.id}/tasks$suffix$options');
 
-    final response = await http.get(uri, headers: await authentication.headers);
+    final response =
+        await http.get(uri, headers: await _authentication.headers);
 
     if (response.statusCode != 200) {
       throw 'Failed to get Tasks in ${list.title}';
@@ -53,8 +62,9 @@ class Tasks {
         .toList();
   }
 
+  /// Creates a new [Task] for a specified [TaskList]
   Future<Task> createTask({required TaskList list, required Task task}) async {
-    final headers = await authentication.headers;
+    final headers = await _authentication.headers;
     final body = jsonEncode(task.toJson());
 
     final uri = Uri.parse('$rootUrl/lists/${list.id}/tasks');
@@ -69,8 +79,9 @@ class Tasks {
     return Task.fromJson(reply);
   }
 
+  /// Save changes made to a [Task]
   Future saveTask(Task task) async {
-    final headers = await authentication.headers;
+    final headers = await _authentication.headers;
     final body = jsonEncode(task.toJson());
 
     final uri = Uri.parse(task.selfLink!);
@@ -82,9 +93,10 @@ class Tasks {
     }
   }
 
+  /// Delete a [Task]
   Future deleteTask(Task task) async {
     final response = await http.delete(Uri.parse(task.selfLink!),
-        headers: await authentication.headers);
+        headers: await _authentication.headers);
 
     if (response.statusCode != 204) {
       throw 'Failed to delete task.\n${jsonDecode(response.body)}\n${task.toJson()}';
