@@ -16,7 +16,7 @@ class Tasks {
       await _authentication.headers;
       return true;
     } catch (e) {
-      debugPrint('$e');
+      debugPrint('TASKS: $e');
       return false;
     }
   }
@@ -24,7 +24,6 @@ class Tasks {
   /// Returns a list of the [TaskList]s available
   Future<List<TaskList>> getLists() async {
     final uri = Uri.parse('$rootUrl/users/@me/lists$suffix');
-    debugPrint(uri.toString());
     final response =
         await http.get(uri, headers: await _authentication.headers);
 
@@ -72,7 +71,7 @@ class Tasks {
     final reply = jsonDecode(response.body);
 
     if (response.statusCode != 200) {
-      debugPrint(reply.toString());
+      debugPrint('TASKS: $reply');
       throw 'Failed to save task: ${task.title}\n$reply';
     }
 

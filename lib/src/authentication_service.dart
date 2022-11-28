@@ -24,28 +24,32 @@ class Authentication {
 
     if (_credentials == null) {
       // Assume no user
+      debugPrint('TASKS: No currently authenticated user');
       if (savedCredentials == null) {
         // Brand new user
+        debugPrint('TASKS: User has no saved credentials. Saving now.');
         _credentials = await _authenticate(clientId: clientId);
         _saveCredentials();
       } else {
         // Recover user
+        debugPrint('TASKS: Recovering user\'s stored credentisl');
         _credentials = AccessCredentials.fromJson(savedCredentials);
       }
     }
 
     if (_credentials!.accessToken.hasExpired) {
       // Assume long time user or just recovered from saved
-      debugPrint('Refreshing access token');
+      debugPrint('TASKS: Refreshing access token');
       _credentials = await refreshCredentials(clientId, _credentials!, client);
       _credentials ??= await _authenticate(clientId: clientId);
       _saveCredentials();
+    } else {
+      debugPrint('TASKS: Credentials still valid');
     }
 
     if (_credentials?.accessToken == null) throw 'Failed to authenticate';
     final token = _credentials!.accessToken;
     final authorization = '${token.type} ${token.data}';
-    debugPrint(authorization);
     return {'Authorization': authorization};
   }
 
@@ -69,7 +73,6 @@ class Authentication {
     if (_credentials == null) throw 'Tring to save unknown credentials';
     final json = jsonEncode(_credentials!.toJson());
     prefs.setString('credentials', json);
-    debugPrint('Credentials saved');
   }
 
   Future<ClientId> _getClientId() async {
