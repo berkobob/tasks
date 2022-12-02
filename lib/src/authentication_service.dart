@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
+import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -17,6 +18,7 @@ class Authentication {
   AccessCredentials? _credentials;
 
   final Map<String, dynamic> _secrets = {};
+  final log = Logger();
 
   Future<Map<String, String>> get headers async {
     final clientId = await _getClientId();
@@ -24,27 +26,27 @@ class Authentication {
 
     if (_credentials == null) {
       // Assume no user
-      debugPrint('TASKS: No currently authenticated user');
+      log.i('No currently authenticated user');
       if (savedCredentials == null) {
         // Brand new user
-        debugPrint('TASKS: User has no saved credentials. Saving now.');
+        log.i('User has no saved credentials. Saving now.');
         _credentials = await _authenticate(clientId: clientId);
         _saveCredentials();
       } else {
         // Recover user
-        debugPrint('TASKS: Recovering user\'s stored credentisl');
+        log.i('Recovering user\'s stored credentisl');
         _credentials = AccessCredentials.fromJson(savedCredentials);
       }
     }
 
     if (_credentials!.accessToken.hasExpired) {
       // Assume long time user or just recovered from saved
-      debugPrint('TASKS: Refreshing access token');
+      debugPrint('Refreshing access token');
       _credentials = await refreshCredentials(clientId, _credentials!, client);
       _credentials ??= await _authenticate(clientId: clientId);
       _saveCredentials();
     } else {
-      debugPrint('TASKS: Credentials still valid');
+      log.i('Credentials still valid');
     }
 
     if (_credentials?.accessToken == null) throw 'Failed to authenticate';

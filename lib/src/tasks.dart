@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
+import 'package:logger/logger.dart';
 import 'package:tasks/src/authentication_service.dart';
 import 'package:tasks/tasks.dart';
 import 'package:http/http.dart' as http;
@@ -9,6 +9,7 @@ class Tasks {
   static const String rootUrl = 'https://tasks.googleapis.com/tasks/v1';
   static const String suffix = '?maxResults=1000';
   final _authentication = Authentication();
+  final log = Logger();
 
   /// Whether access to Google Tasks API is available
   Future<bool> hasAccess() async {
@@ -16,7 +17,7 @@ class Tasks {
       await _authentication.headers;
       return true;
     } catch (e) {
-      debugPrint('TASKS: $e');
+      log.e('Error getting authentication headers', e as Error);
       return false;
     }
   }
@@ -71,7 +72,7 @@ class Tasks {
     final reply = jsonDecode(response.body);
 
     if (response.statusCode != 200) {
-      debugPrint('TASKS: $reply');
+      log.i(reply);
       throw 'Failed to save task: ${task.title}\n$reply';
     }
 

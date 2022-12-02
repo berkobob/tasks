@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:tasks/tasks.dart';
+import 'package:logger/logger.dart';
 
-void main() => runApp(const ExampleApp());
+void main() {
+  Logger().registerPrinter(printer);
+  runApp(const ExampleApp());
+}
 
 class ExampleApp extends StatefulWidget {
   const ExampleApp({super.key});
