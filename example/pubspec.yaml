@@ -11,6 +11,9 @@ dependencies:
     sdk: flutter
   tasks:
     path: ..
+  logger:
+    git:
+      url: https://github.com/berkobob/logger 
 
   cupertino_icons: ^1.0.2
 

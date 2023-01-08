@@ -17,7 +17,7 @@ class Tasks {
       await _authentication.headers;
       return true;
     } catch (e) {
-      log.e('Error getting authentication headers', e as Error);
+      log.e('Error getting authentication headers', AssertionError(e));
       return false;
     }
   }
