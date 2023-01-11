@@ -132,7 +132,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
+<<<<<<< HEAD
       ref: HEAD
+=======
+      ref: main
+>>>>>>> 72465de (Use logger from GitHub)
       resolved-ref: d875ad2b6ed54095d2a3496dead0854cf8ac825a
       url: "https://github.com/berkobob/logger"
     source: git
