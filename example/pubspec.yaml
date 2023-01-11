@@ -14,7 +14,7 @@ dependencies:
   logger:
     git:
       url: https://github.com/berkobob/logger 
-      ref: HEAD
+      ref: main
 
   cupertino_icons: ^1.0.2
 
