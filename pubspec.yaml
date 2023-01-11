@@ -17,12 +17,7 @@ dependencies:
   url_launcher: ^6.1.6
   logger:
     git:
-<<<<<<< HEAD
       url: https://github.com/berkobob/logger 
-=======
-      url: https://github.com/berkobob/logger
-      ref: main
->>>>>>> 72465de (Use logger from GitHub)
 
 dev_dependencies:
   flutter_lints: ^2.0.0
