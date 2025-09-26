@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
 import 'package:logger/logger.dart';
@@ -41,7 +41,7 @@ class Authentication {
 
     if (_credentials!.accessToken.hasExpired) {
       // Assume long time user or just recovered from saved
-      debugPrint('Refreshing access token');
+      log.i('Refreshing access token');
       _credentials = await refreshCredentials(clientId, _credentials!, client);
       _credentials ??= await _authenticate(clientId: clientId);
       _saveCredentials();
@@ -81,10 +81,15 @@ class Authentication {
     if (_secrets.isEmpty) {
       // Assume first time through
       try {
-        final data = await rootBundle.loadString('assets/client-secrets.json');
+        final data = Platform.isMacOS
+            ? await File(
+                    '/Users/antoine/dev/lib/tasks/example/assets/client-secrets.json')
+                .readAsString()
+            : await rootBundle.loadString('assets/client-secrets.json');
         final json = jsonDecode(data);
         _secrets.addAll(json['installed']);
       } catch (e) {
+        log.e('$e');
         _secrets['client_secret'] = Platform.environment['client_secret'];
         _secrets['client_id'] = Platform.environment['client_id'];
       }
